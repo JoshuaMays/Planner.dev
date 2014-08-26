@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Todo List</title>
+	<link rel="stylesheet" href="/css...">
 </head>
 <body>
 	<h1>$_GET</h1>
@@ -21,9 +22,9 @@
 
 	<h2>Add a Task to the List</h2>
 	<form method="POST" action="/todo_list.php">
-		<input type="text" name="add_item" id="add_item" placeholder="fill me out, yo.">
+		<input type="text" name="add_item" id="add_item" placeholder="fill me out, yo." style="border-radius:7px;">
 		
-		<input type="submit" value="Put me in, Coach">
+		<input type="submit" value="Put me in, Coach" style="border-radius:7px;">
 	</form>
 
 </body>
