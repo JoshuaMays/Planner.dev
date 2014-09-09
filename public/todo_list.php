@@ -1,6 +1,6 @@
 <?php
     // Define a constant filepath/name to read/write
-    define('FILENAME', 'data/todo_items.txt');
+    define('FILENAME', '../data/todo_items.txt');
 
     // Initialize the todoList variable
     $todoList = [];
@@ -57,10 +57,10 @@
                     saveFile($todoList);
                 }
                 
-                    foreach ($todoList as $key => $item) {
-                        echo '<li><a href=' . "?remove=$key" . ">Mark Complete</a> - $item</li>";
-                        // saveFile($todoList);
-                    }
+                foreach ($todoList as $key => $item) {
+                    echo '<li><a href=' . "?remove=$key" . ">Mark Complete</a> - $item</li>";
+                    // saveFile($todoList);
+                }
             ?>
         </ul>
         <div id="form">
