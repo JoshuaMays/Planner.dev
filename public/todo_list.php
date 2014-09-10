@@ -31,7 +31,7 @@
     // Populate todoList with items from the file.
     $todoList = listFromFile();
     
-    // Allow user to 
+    // Allow user to upload a todo list (only .txt files).
     if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == 0 && $_FILES['fileUpload']['type'] == 'text/plain') {
         // upload directory path
         $upload_dir = '/vagrant/sites/planner.dev/public/uploads/';
@@ -120,6 +120,7 @@
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script>
+        // Adding remove-button class to allow user to delete a task after it has been completed.
         var removeButtons = document.getElementsByClassName("remove-button");
         for (var i=0; i < removeButtons.length; i++) {
             removeButtons[i].addEventListener("click", function() {
