@@ -55,6 +55,13 @@ if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']
     saveCSVFile($addressBook);
 }
 
+if (isset($_GET['remove'])) {
+    $removeKey = $_GET['remove'];
+    unset($addressBook[$removeKey]);
+    $addressBook = array_values($addressBook);
+    saveCSVFile($addressBook);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -69,8 +76,9 @@ if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']
     <div id="wrap">
         <div id ="addressBook" class="row">
             <div class="col-md-12 table-responsive">
-                <table class="table table-striped table-bordered">
+                <table class="table table-striped table-bordered table-condensed">
                     <tr>
+                        <th>Delete</th>
                         <th>Name</th>
                         <th>Address</th>
                         <th>City</th>
@@ -79,7 +87,7 @@ if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']
                         <th>Phone Number</th>
                     </tr>
                     <? foreach($addressBook as $entry => $row): ?>
-                        <tr>
+                        <tr><td><a href="?remove=<?=$entry?>">Delete</a></td>
                             <? foreach($row as $columnData): ?>
                                 <td>
                                     <?= $columnData ?>
