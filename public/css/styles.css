@@ -1,0 +1,59 @@
+body {
+	font-size:15px;
+	background-color: #998CDE;
+	font-family:"Segoe UI", Candara, "Bitstream Vera Sans", sans-serif;
+}
+
+#container {
+	margin: 0 10%;
+}
+
+h1:first-child {
+	color:#fff;
+}
+
+h1, h2 {
+	color:#37F1D0;
+	text-decoration: none;
+}
+
+ol {
+	list-style: numbered;
+}
+
+li {
+	max-width:50%;
+	margin: 15px auto; 
+	/*background-color: #fff;*/
+	color: #000;
+}
+
+/*li:nth-child(2n) {
+	background-color: #000;
+	color: #fff;
+}*/
+
+li:hover {
+	background-color: #f9f412;
+}
+
+li:nth-child(2n):hover {
+	color: #000;
+}
+
+input {
+	border-radius:7px;	
+}
+
+input[type="submit"] {
+	cursor: pointer;
+
+}
+
+#todo {
+	text-align: center;
+}
+
+button {
+	color: #000;
+}
