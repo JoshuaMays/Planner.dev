@@ -32,6 +32,7 @@ function readCSVFile($filename = FILENAME) {
     return $addressBook;
 }
 
+// LOAD SAVED ADDRESS BOOK CSV TO POPULATE ADDRESS BOOK TABLE
 $addressBook = readCSVFile();
 
 saveCSVFile($addressBook);
@@ -55,6 +56,7 @@ if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']
     saveCSVFile($addressBook);
 }
 
+// GET REQUEST TO REMOVE SINGLE ENTRIES FROM THE ADDRESS BOOK
 if (isset($_GET['remove'])) {
     $removeKey = $_GET['remove'];
     unset($addressBook[$removeKey]);
@@ -86,8 +88,10 @@ if (isset($_GET['remove'])) {
                         <th>Zip Code</th>
                         <th>Phone Number</th>
                     </tr>
+                    <!-- LOOPING THROUGH TOP LEVEL ARRAY OF ADDRESS BOOK ENTRIES -->
                     <? foreach($addressBook as $entry => $row): ?>
                         <tr><td><a href="?remove=<?=$entry?>">Delete</a></td>
+                            <!-- LOOPING THROUGH ARRAY OF CONTACT ENTRIES, PRINTING DATA INTO TABLE COLUMNS -->
                             <? foreach($row as $columnData): ?>
                                 <td>
                                     <?= $columnData ?>
