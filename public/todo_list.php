@@ -32,7 +32,7 @@
     $todoList = listFromFile();
     
     // Allow user to upload a todo list (only .txt files).
-    if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == 0 && $_FILES['fileUpload']['type'] == 'text/plain') {
+    if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK && $_FILES['fileUpload']['type'] == 'text/plain') {
         // upload directory path
         $upload_dir = '/vagrant/sites/planner.dev/public/uploads/';
         // uploaded file name
@@ -61,7 +61,7 @@
     }
 
     // Add items from uploaded file to $todoList
-    if (isset($_FILES['fileUpload']['name'])) {
+    if (isset($_FILES['fileUpload']['name']) && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
         $newlist = listFromFile($savedfile);
         if ($_POST['listPosition'] == 'top') {
             $todoList = array_merge($newlist, $todoList);
@@ -71,6 +71,7 @@
         }
         saveFile($todoList);
     }
+
 
 ?>
 <!DOCTYPE html>
