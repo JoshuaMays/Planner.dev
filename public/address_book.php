@@ -1,3 +1,6 @@
+<?php echo 'hello there my name is joshua and this is a paragraph' . PHP_EOL . 'HELLO AGAIN'; ?>
+
+
 <?php
 // DEFINE A CONSTANT FILEPATH/NAME TO READ/WRITE
 define('FILENAME', '../data/address_book.csv');
@@ -76,13 +79,13 @@ if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']
 
 // ALLOW USER TO UPLOAD A CSV FILE TO IMPORT CONTACTS INTO THE ADDRESS BOOK
 if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
-        // UPLOAD DIRECTORY PATH
-        $uploadDir = '/vagrant/sites/planner.dev/public/uploads/';
-        $uploadFilename = basename($_FILES['fileUpload']['name']);
-        // UPLOADED PATH AND FILENAME
-        $savedFile = $uploadDir . $uploadFilename;
-        // MOVE TMP FILE TO UPLOADS DIRECTORY
-        move_uploaded_file($_FILES['fileUpload']['tmp_name'], $savedFile);
+    // UPLOAD DIRECTORY PATH
+    $uploadDir = '/vagrant/sites/planner.dev/public/uploads/';
+    $uploadFilename = basename($_FILES['fileUpload']['name']);
+    // UPLOADED PATH AND FILENAME
+    $savedFile = $uploadDir . $uploadFilename;
+    // MOVE TMP FILE TO UPLOADS DIRECTORY
+    move_uploaded_file($_FILES['fileUpload']['tmp_name'], $savedFile);
 }
 
 // AFTER FILE IS UPLOADED, SAVE NEW CONTACTS TO THE ADDRESS BOOK 
