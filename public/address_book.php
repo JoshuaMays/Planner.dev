@@ -1,6 +1,3 @@
-<?php echo 'hello there my name is joshua and this is a paragraph' . PHP_EOL . 'HELLO AGAIN'; ?>
-
-
 <?php
 // DEFINE A CONSTANT FILEPATH/NAME TO READ/WRITE
 define('FILENAME', '../data/address_book.csv');
@@ -105,6 +102,7 @@ if (isset($_POST['remove_item'])) {
     $addressBook = array_values($addressBook);
     $addressDS->saveAddressBook($addressBook);
 }
+
 
 ?>
 
