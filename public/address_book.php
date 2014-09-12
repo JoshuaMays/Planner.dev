@@ -36,6 +36,14 @@ class AddressDataStore {
     }
 }
 
+// FUNCTION TO STRIP PHONE NUMBERS OF NON-NUMERIC CHARACTERS
+function phoneReplace($phone) {
+
+    $nums = preg_replace('/[^0-9]/','',$phone);
+    
+    return $nums;
+}
+
 // INSTANTIATE AN ADDRESS DATA STORE OBJECT
 $addressDS = new AddressDataStore(FILENAME);
 
@@ -49,15 +57,16 @@ $addressDS->readAddressBook($addressBook);
 if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zip']) && !empty($_POST['phone'])) {
     // PREVENT CODE INJECTION ON EACH INPUT
     foreach ($_POST as $key => $input) {
-        $_POST[$key] = strip_tags($input);
+        $_POST[$key] = strip_tags(trim($input));
     }
+
     // ASSIGN FORM INPUT DATA TO SPECIFIC INDEXES
     $newEntry[0] = $_POST['name'];
     $newEntry[1] = $_POST['address'];
     $newEntry[2] = $_POST['city'];
     $newEntry[3] = $_POST['state'];
     $newEntry[4] = $_POST['zip'];
-    $newEntry[5] = $_POST['phone'];
+    $newEntry[5] = phoneReplace($_POST['phone']);
     
     // PUSH FORM ADDRESS BOOK ENTRY INTO ADDRESS BOOK ARRAY.
     $addressBook[] = $newEntry;
@@ -86,16 +95,13 @@ if (!empty($_FILES) && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
     $addressDS->saveAddressBook($addressBook);
 }
 
-//GET REQUEST TO REMOVE SINGLE ENTRIES FROM THE ADDRESS BOOK
-//CHANGE THIS TO A JS POST EVENT (HIDDEN FORM), NOT A GET REQUEST
-if (isset($_GET['remove'])) {
-    $removeKey = $_GET['remove'];
-    unset($addressBook[$removeKey]);
+// ALLOW USER TO DELETE A CONTACT ENTRY 
+if (isset($_POST['remove_item'])) {
+    $removeRow = $_POST['remove_item'];
+    unset($addressBook[$removeRow]);
     $addressBook = array_values($addressBook);
     $addressDS->saveAddressBook($addressBook);
 }
-
-
 
 ?>
 
@@ -125,6 +131,7 @@ if (isset($_GET['remove'])) {
                         </tr>
                         <!-- LOOPING THROUGH TOP LEVEL ARRAY OF ADDRESS BOOK ENTRIES -->
                         <? foreach($addressBook as $entry => $row): ?>
+                            
                             <tr>
                                 <!-- LOOPING THROUGH ARRAY OF CONTACT ENTRIES, PRINTING DATA INTO TABLE COLUMNS -->
                                 <? foreach($row as $columnData): ?>
@@ -132,8 +139,7 @@ if (isset($_GET['remove'])) {
                                         <?= $columnData ?>
                                     </td>
                                 <? endforeach; ?>
-                                <td><a href="?remove=<?=$entry?>">Delete</a></td>
-                            </tr>
+                                <td><button class="btn btn-danger remove-button" data-item-id="<?= $entry; ?>" >Delete</button></td>
                         <? endforeach; ?>
                     </table>
                 </div>
@@ -173,9 +179,21 @@ if (isset($_GET['remove'])) {
             </footer>
         </div>
     </div>
+    <form action="/address_book.php" method="POST" id="remove-form">
+        <input type="hidden" name="remove_item" id="remove-item">
+    </form>
     <script src="/js/jquery-1.11.0.js"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    
+    <script>
+        var removeButtons = document.getElementsByClassName("remove-button");
+        for (var i=0; i < removeButtons.length; i++) {
+            removeButtons[i].addEventListener("click", function() {
+                var itemId = this.attributes['data-item-id'].value;
+                document.getElementById("remove-item").value = itemId;
+                document.getElementById("remove-form").submit();
+            });
+        }
+    </script>
 </body>
 </html>
