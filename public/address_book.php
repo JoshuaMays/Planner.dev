@@ -103,7 +103,6 @@ if (isset($_POST['remove_item'])) {
     $addressDS->saveAddressBook($addressBook);
 }
 
-
 ?>
 
 <!DOCTYPE html>
