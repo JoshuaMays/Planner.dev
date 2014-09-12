@@ -2,40 +2,6 @@
 // DEFINE A CONSTANT FILEPATH/NAME TO READ/WRITE
 define('FILENAME', '../data/address_book.csv');
 
-// CLASS DEFINITION FOR ADDRESS DATA STORE
-class AddressDataStore {
-    public $filename = '';
-    
-    // CONSTRUCTOR FOR ADDRESS DATA STORE OBJECTS
-    public function __construct($filename) {
-        $this->filename = $filename;
-    }
-
-    // FUNCTION TO READ CSV FILE DATA INTO AN ARRAY
-    public function readAddressBook() {
-        $addressBook = [];
-        $handle = fopen($this->filename, 'r');
-        while (!feof($handle)) {
-            $row = fgetcsv($handle);
-            if (!empty($row)) {
-                $addressBook[] = $row;
-            }
-        }
-        fclose($handle);
-        return $addressBook;
-    }
-
-    // FUNCTION TO SAVE ADDRESS ENTRY DATA TO CSV FILE
-    public function saveAddressBook($addressArray) {
-        $handle = fopen($this->filename, 'w');
-        
-        foreach($addressArray as $row) {
-            fputcsv($handle, $row);
-        }
-        fclose($handle);
-    }
-}
-
 // FUNCTION TO STRIP PHONE NUMBERS OF NON-NUMERIC CHARACTERS
 function phoneReplace($phone) {
 
@@ -43,6 +9,9 @@ function phoneReplace($phone) {
     
     return $nums;
 }
+
+// INCLUDING ADDRESS DATA STORE CLASS DEFINITION
+include_once('classes/address_data_store.php');
 
 // INSTANTIATE AN ADDRESS DATA STORE OBJECT
 $addressDS = new AddressDataStore(FILENAME);
@@ -53,7 +22,6 @@ $addressBook = $addressDS->readAddressBook();
 $addressDS->readAddressBook($addressBook);
 
 // CAPTURE FORM DATA TO AN ADDRESS BOOK
-// if (!empty($_FILES)) 
 if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zip']) && !empty($_POST['phone'])) {
     // PREVENT CODE INJECTION ON EACH INPUT
     foreach ($_POST as $key => $input) {
@@ -145,6 +113,7 @@ if (isset($_POST['remove_item'])) {
                 </div>
                 <div class="container">
                     <div class="col-md-3">
+                        <!-- FORM TO ENTER SINGLE CONTACT -->
                         <h2>Add a Contact</h2>
                         <form method="POST" action="/address_book.php" class="form-horizontal">
                             <label for="name">Name: </label> 
@@ -161,6 +130,7 @@ if (isset($_POST['remove_item'])) {
                             <input type="tel" name="phone" id="phone" class="form-control" placeholder="Phone Number"> <br>
                             <input type="submit" value="Submit" class="btn btn-primary">
                         </form>
+                        <!-- FORM TO IMPORT CSV LIST OF CONTACTS -->
                         <h2>Import Contacts</h2>
                         <form method="POST" action="/address_book.php" enctype="multipart/form-data" class="form-horizontal">
                             <label for="upload">File to Import:</label>
@@ -179,6 +149,7 @@ if (isset($_POST['remove_item'])) {
             </footer>
         </div>
     </div>
+    <!-- HIDDEN FORM TO DELETE SINGLE CONTACT WITH DELETE BUTTONS -->
     <form action="/address_book.php" method="POST" id="remove-form">
         <input type="hidden" name="remove_item" id="remove-item">
     </form>
