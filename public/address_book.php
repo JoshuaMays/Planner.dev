@@ -1,4 +1,7 @@
 <?php
+// INCLUDING ADDRESS DATA STORE CLASS DEFINITION
+require_once('classes/address_data_store.php');
+
 // DEFINE A CONSTANT FILEPATH/NAME TO READ/WRITE
 define('FILENAME', '../data/address_book.csv');
 
@@ -10,8 +13,6 @@ function phoneReplace($phone) {
     return $nums;
 }
 
-// INCLUDING ADDRESS DATA STORE CLASS DEFINITION
-include_once('classes/address_data_store.php');
 
 // INSTANTIATE AN ADDRESS DATA STORE OBJECT
 $addressDS = new AddressDataStore(FILENAME);
