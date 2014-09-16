@@ -19,7 +19,7 @@
         }
         return $list;
     }
-
+    // Function to save todolist to a file
     function saveFile($todoList, $filename = FILENAME) {
         // Open file and overwrite contents.
         $handle = fopen($filename, 'w');
