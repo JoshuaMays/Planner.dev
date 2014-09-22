@@ -47,10 +47,6 @@ if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
 
     // MOVE TMP FILE TO UPLOADS DIRECTORY
     move_uploaded_file($_FILES['fileUpload']['tmp_name'], $savedFile);
-// }
-
-// // AFTER FILE IS UPLOADED, SAVE NEW CONTACTS TO THE ADDRESS BOOK 
-// if (!empty($_FILES) && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
 
     // CREATE A NEW ADDRESSDATASTORE OBJECT TO COPY THE NEW CONTACTS
     $importedList = new AddressDataStore($savedFile);
