@@ -1,18 +1,15 @@
 <?php
 // INCLUDING ADDRESS DATA STORE CLASS DEFINITION
-require_once('classes/address_data_store.php');
+require_once('inc/address_data_store.php');
 
 // DEFINE A CONSTANT FILEPATH/NAME TO READ/WRITE
-define('FILENAME', '../data/address_book.csv');
+define('FILENAME', '../data/ADDRESS_BOOK.csv');
 
 // FUNCTION TO STRIP PHONE NUMBERS OF NON-NUMERIC CHARACTERS
 function phoneReplace($phone) {
-
     $nums = preg_replace('/[^0-9]/','',$phone);
-    
     return $nums;
 }
-
 
 // INSTANTIATE AN ADDRESS DATA STORE OBJECT
 $addressDS = new AddressDataStore(FILENAME);
@@ -20,48 +17,48 @@ $addressDS = new AddressDataStore(FILENAME);
 // ASSIGN ADDRESS ARRAY TO A VARIABLE
 $addressBook = $addressDS->readAddressBook();
 
-$addressDS->readAddressBook($addressBook);
-
 // CAPTURE FORM DATA TO AN ADDRESS BOOK
 if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zip']) && !empty($_POST['phone'])) {
-    // PREVENT CODE INJECTION ON EACH INPUT
+
+    // PREVENT X-SCRIPTING ON EACH INPUT
     foreach ($_POST as $key => $input) {
         $_POST[$key] = strip_tags(trim($input));
     }
 
-    // ASSIGN FORM INPUT DATA TO SPECIFIC INDEXES
-    $newEntry[0] = $_POST['name'];
-    $newEntry[1] = $_POST['address'];
-    $newEntry[2] = $_POST['city'];
-    $newEntry[3] = $_POST['state'];
-    $newEntry[4] = $_POST['zip'];
-    $newEntry[5] = phoneReplace($_POST['phone']);
-    
+    // SANITIZE PHONE NUMBER FOR DATABASE
+    $_POST['phone'] = phoneReplace($_POST['phone']);
+
     // PUSH FORM ADDRESS BOOK ENTRY INTO ADDRESS BOOK ARRAY.
-    $addressBook[] = $newEntry;
+    $addressBook[] = $_POST;
+
     // SAVE NEW ENTRY TO CSV FILE
-    $addressDS->saveAddressBook($addressBook);
+    $addressDS->writeAddressBook($addressBook);
 }
 
 // ALLOW USER TO UPLOAD A CSV FILE TO IMPORT CONTACTS INTO THE ADDRESS BOOK
 if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
+
     // UPLOAD DIRECTORY PATH
     $uploadDir = '/vagrant/sites/planner.dev/public/uploads/';
     $uploadFilename = basename($_FILES['fileUpload']['name']);
+
     // UPLOADED PATH AND FILENAME
     $savedFile = $uploadDir . $uploadFilename;
+
     // MOVE TMP FILE TO UPLOADS DIRECTORY
     move_uploaded_file($_FILES['fileUpload']['tmp_name'], $savedFile);
-}
+// }
 
-// AFTER FILE IS UPLOADED, SAVE NEW CONTACTS TO THE ADDRESS BOOK 
-if (!empty($_FILES) && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
+// // AFTER FILE IS UPLOADED, SAVE NEW CONTACTS TO THE ADDRESS BOOK 
+// if (!empty($_FILES) && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
+
     // CREATE A NEW ADDRESSDATASTORE OBJECT TO COPY THE NEW CONTACTS
     $importedList = new AddressDataStore($savedFile);
     $newlist = $importedList->readAddressBook();
+
     // MERGE THE TWO CONTACT LISTS
     $addressBook = array_merge($addressBook, $newlist);
-    $addressDS->saveAddressBook($addressBook);
+    $addressDS->writeAddressBook($addressBook);
 }
 
 // ALLOW USER TO DELETE A CONTACT ENTRY 
@@ -69,7 +66,7 @@ if (isset($_POST['remove_item'])) {
     $removeRow = $_POST['remove_item'];
     unset($addressBook[$removeRow]);
     $addressBook = array_values($addressBook);
-    $addressDS->saveAddressBook($addressBook);
+    $addressDS->writeAddressBook($addressBook);
 }
 
 ?>
@@ -78,7 +75,7 @@ if (isset($_POST['remove_item'])) {
 <html>
 <head>
     <title>Address Book</title>
-    <!-- Latest compiled and minified CSS -->
+    <!-- LATEST COMPILED AND MINIFIED BOOTSRAP CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/address_styles.css" >
 </head>
@@ -90,19 +87,18 @@ if (isset($_POST['remove_item'])) {
                     <h2>Contacts</h2>
                     <table class="table table-striped table-bordered table-condensed">
                         <tr>
-                            <th>Name</th>
-                            <th>Address</th>
-                            <th>City</th>
-                            <th>State</th>
-                            <th>Zip Code</th>
-                            <th>Phone Number</th>
-                            <th>Delete</th>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Address</th>
+                            <th class="text-center">City</th>
+                            <th class="text-center">State</th>
+                            <th class="text-center">Zip Code</th>
+                            <th class="text-center">Phone Number</th>
+                            <th class="text-center">Delete</th>
                         </tr>
-                        <!-- LOOPING THROUGH TOP LEVEL ARRAY OF ADDRESS BOOK ENTRIES -->
+                        <? // LOOPING THROUGH TOP LEVEL ARRAY OF ADDRESS BOOK ENTRIES ?>
                         <? foreach($addressBook as $entry => $row): ?>
-                            
                             <tr>
-                                <!-- LOOPING THROUGH ARRAY OF CONTACT ENTRIES, PRINTING DATA INTO TABLE COLUMNS -->
+                                <? // LOOPING THROUGH ARRAY OF CONTACT ENTRIES, PRINTING DATA INTO TABLE COLUMNS ?>
                                 <? foreach($row as $columnData): ?>
                                     <td>
                                         <?= $columnData ?>
@@ -135,7 +131,7 @@ if (isset($_POST['remove_item'])) {
                         <h2>Import Contacts</h2>
                         <form method="POST" action="/address_book.php" enctype="multipart/form-data" class="form-horizontal">
                             <label for="upload">File to Import:</label>
-                            <input type="file" name="fileUpload" id="fileUpload" class="form-control"><br>
+                            <input type="file" name="fileUpload" id="upload" class="form-control"><br>
                             <input type="submit" value="Import" class="btn btn-primary">
                         </form>
                     </div>
