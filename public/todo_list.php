@@ -1,97 +1,87 @@
 <?php
 
-    // Define a constant filepath/name to read/write
+    require('inc/filestore.php');
+
+    // DEFINE A CONSTANT FILEPATH/NAME TO READ/WRITE
     define('FILENAME', '../data/todo_items.txt');
 
-    // Initialize the todoList variable
+    // INSTANTIATE FILESTORE OBJECT $todo
+    $todo = new Filestore(FILENAME);
+
+    // INITIALIZE THE $todoList ARRAY
     $todoList = [];
 
-    // Open the file to populate the list
-    function listFromFile($filename = FILENAME) {
-        $list = [];
-        if (filesize($filename) > 0) {
-            // Open file, save content of file to a string $content and close the file.
-            $handle = fopen($filename, 'r');
-            $content = trim(fread($handle, filesize($filename)));
-            fclose($handle);
-            // Create an array from the string $content.
-            $list = explode("\n", $content);
-        }
-        return $list;
-    }
-    // Function to save todolist to a file
-    function saveFile($todoList, $filename = FILENAME) {
-        // Open file and overwrite contents.
-        $handle = fopen($filename, 'w');
-        // Loop through the list and write each list item to file.
-        foreach ($todoList as $listItem) {
-            fwrite($handle, $listItem . PHP_EOL);
-        }
-        fclose($handle);
-    }
-    // Populate todoList with items from the file.
-    $todoList = listFromFile();
-    
-    // Allow user to upload a todo list (only .txt files).
+    // POPULATE $todoList BY READING FROM FILE
+    $todoList = $todo->readLines();
+
+    // ALLOW USER TO UPLOAD A TODO LIST (.TXT ONLY) FILE
     if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK && $_FILES['fileUpload']['type'] == 'text/plain') {
-        // upload directory path
+
+        // UPLOAD DIRECTORY PATH
         $upload_dir = '/vagrant/sites/planner.dev/public/uploads/';
-        // uploaded file name
+
+        // UPLOADED FILENAME
         $uploadfilename = basename($_FILES['fileUpload']['name']);
         $savedfile = $upload_dir . $uploadfilename;
-        // move tmp file to uploads directory
+
+        // MOVE TMP FILE TO UPLOADS DIRECTORY
         move_uploaded_file($_FILES['fileUpload']['tmp_name'], $savedfile);
     }
-    // Give user access to the file they just uploaded
+
+    // GIVE USER ACCESS TO THE FILE THEY UPLOADED
     if (isset($savedfile)) {
-        echo "OMG YOU UPLOADED A FILE! Download your file <a href='/uploads/{$uploadfilename}'>here</a>";
+        echo "Well hello there. You just uploaded a file. Download it @ <a href='/uploads/{$uploadfilename}'>here</a>";
     }
-    // Add single item from input form.
+
+    // ADD SINGLE ITEM FROM INPUT FORM
     if (isset($_POST['additem'])) {
         $_POST['additem'] = strip_tags($_POST['additem']);
         $todoList[] = $_POST['additem'];
-        saveFile($todoList);
+        $todo->writeLines($todoList);
     }
 
-    // Remove single item from $todoList
+    // REMOVE SINGLE ITEM FROM $todoList
     if (isset($_POST['remove_item'])) {
         $removeKey = $_POST['remove_item'];
         unset($todoList[$removeKey]);
         $todoList = array_values($todoList);
-        saveFile($todoList);
+        $todo->writeLines($todoList);
     }
 
-    // Add items from uploaded file to $todoList
+    // ADD ITEMS FROM UPLOADED FILE TO $todoList
     if (isset($_FILES['fileUpload']['name']) && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
-        $newlist = listFromFile($savedfile);
+        $importTodo = new Filestore($savedfile);
+        $newlist = $importTodo->readLines();
+
+        // ADD ITEMS TO THE TOP OR BOTTOM OF THE LIST
         if ($_POST['listPosition'] == 'top') {
             $todoList = array_merge($newlist, $todoList);
         }
         else {
             $todoList = array_merge($todoList, $newlist);
         }
-        saveFile($todoList);
-    }
 
+        // SAVE TODOLIST AFTER IMPORT
+        $todo->writeLines($todoList);
+    }
 
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Todo List</title>
-    <!-- Latest compiled and minified CSS -->
+    <!-- LATEST COMPILED AND MINIFIED CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-    <!-- Custom Styles -->
+    <!-- CUSTOM STYLES -->
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
     <div id="container">
         <h1 id="todo">Todo List!</h1>
-        <ol><!-- List out each of the todo items from files or form input -->
+        <ol>
+            <!-- LIST OUT EACH OF THE TODO ITEMS -->
             <? foreach ($todoList as $key => $item): ?>
-                <? if ($key != 0): ?>
-                    <li><button class="btn btn-danger remove-button" data-item-id="<?= $key; ?>" >Mark Complete</button> <?= $item ?></li>
-                <? endif; ?>
+                <li><button class="btn btn-danger remove-button" data-item-id="<?= $key; ?>" >Mark Complete</button> <?= $item ?></li>
             <? endforeach; ?>
         </ol>
         <div id="form" class="container">
@@ -103,7 +93,6 @@
             </form>
         </div>
         <div id="upload-container" class="container">
-
             <h2>Add Tasks from a File:</h2>
             <form method="POST" enctype="multipart/form-data">
                 <p><label for="upload">File to Upload:</label>
@@ -112,17 +101,15 @@
                 <input type="radio" name="listPosition" value="bottom" id="addBottom" checked> <label for="addBottom">Add to Bottom</label></p>
                 <p><input type="submit" value="Upload" class="btn btn-default"></p>
             </form>
-
         </div>
     </div>
-    
     <form action="/todo_list.php" method="POST" id="remove-form">
         <input type="hidden" name="remove_item" id="remove-item">
     </form>
-    <!-- Latest compiled and minified JavaScript -->
+    <!-- LATEST COMPILED AND MINIFIED JAVASCRIPT -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script>
-        // Adding remove-button class to allow user to delete a task after it has been completed.
+        // ADDING REMOVE-BUTTON CLASS TO ALLOW USER TO DELETE A TASK
         var removeButtons = document.getElementsByClassName("remove-button");
         for (var i=0; i < removeButtons.length; i++) {
             removeButtons[i].addEventListener("click", function() {
