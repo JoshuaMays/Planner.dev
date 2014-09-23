@@ -3,7 +3,7 @@
 require_once('inc/address_data_store.php');
 
 // DEFINE A CONSTANT FILEPATH/NAME TO READ/WRITE
-define('FILENAME', '../data/ADDRESS_BOOK.csv');
+define('FILENAME', '../data/address_book.csv');
 
 // FUNCTION TO STRIP PHONE NUMBERS OF NON-NUMERIC CHARACTERS
 function phoneReplace($phone) {
@@ -15,15 +15,18 @@ function phoneReplace($phone) {
 $addressDS = new AddressDataStore(FILENAME);
 
 // ASSIGN ADDRESS ARRAY TO A VARIABLE
-$addressBook = $addressDS->readAddressBook();
+$addressBook = $addressDS->read();
 
 // CAPTURE FORM DATA TO AN ADDRESS BOOK
-if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']) && !empty($_POST['state']) && !empty($_POST['zip']) && !empty($_POST['phone'])) {
+if (!empty($_POST) && !isset($_POST['remove_item'])) {
 
     // PREVENT X-SCRIPTING ON EACH INPUT
     foreach ($_POST as $key => $input) {
         $_POST[$key] = strip_tags(trim($input));
     }
+
+    // Run INPUT LENGTH VALIDATION
+    $addressDS->checkLength($_POST);
 
     // SANITIZE PHONE NUMBER FOR DATABASE
     $_POST['phone'] = phoneReplace($_POST['phone']);
@@ -32,7 +35,7 @@ if (!empty($_POST['name']) && !empty($_POST['address']) && !empty($_POST['city']
     $addressBook[] = $_POST;
 
     // SAVE NEW ENTRY TO CSV FILE
-    $addressDS->writeAddressBook($addressBook);
+    $addressDS->write($addressBook);
 }
 
 // ALLOW USER TO UPLOAD A CSV FILE TO IMPORT CONTACTS INTO THE ADDRESS BOOK
@@ -50,11 +53,12 @@ if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
 
     // CREATE A NEW ADDRESSDATASTORE OBJECT TO COPY THE NEW CONTACTS
     $importedList = new AddressDataStore($savedFile);
-    $newlist = $importedList->readAddressBook();
+    $newlist = $importedList->read();
 
     // MERGE THE TWO CONTACT LISTS
     $addressBook = array_merge($addressBook, $newlist);
-    $addressDS->writeAddressBook($addressBook);
+    
+    $addressDS->write($addressBook);
 }
 
 // ALLOW USER TO DELETE A CONTACT ENTRY 
@@ -62,7 +66,7 @@ if (isset($_POST['remove_item'])) {
     $removeRow = $_POST['remove_item'];
     unset($addressBook[$removeRow]);
     $addressBook = array_values($addressBook);
-    $addressDS->writeAddressBook($addressBook);
+    $addressDS->write($addressBook);
 }
 
 ?>

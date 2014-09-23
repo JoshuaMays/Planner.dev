@@ -12,7 +12,7 @@
     $todoList = [];
 
     // POPULATE $todoList BY READING FROM FILE
-    $todoList = $todo->readLines();
+    $todoList = $todo->read();
 
     // ALLOW USER TO UPLOAD A TODO LIST (.TXT ONLY) FILE
     if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK && $_FILES['fileUpload']['type'] == 'text/plain') {
@@ -35,9 +35,14 @@
 
     // ADD SINGLE ITEM FROM INPUT FORM
     if (isset($_POST['additem'])) {
+        // THROW EXCEPTION IF TODO ITEM IS EMPTY OR LONGER THAN 240 CHARS
+        if (strlen($_POST['additem']) == 0 || strlen($_POST['additem']) > 240 ) {
+            throw new Exception("Your todo item was either empty or longer than 240 characters. \"{$_POST['additem']}\"");
+        }
+        
         $_POST['additem'] = strip_tags($_POST['additem']);
         $todoList[] = $_POST['additem'];
-        $todo->writeLines($todoList);
+        $todo->write($todoList);
     }
 
     // REMOVE SINGLE ITEM FROM $todoList
@@ -45,13 +50,13 @@
         $removeKey = $_POST['remove_item'];
         unset($todoList[$removeKey]);
         $todoList = array_values($todoList);
-        $todo->writeLines($todoList);
+        $todo->write($todoList);
     }
 
     // ADD ITEMS FROM UPLOADED FILE TO $todoList
     if (isset($_FILES['fileUpload']['name']) && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK) {
         $importTodo = new Filestore($savedfile);
-        $newlist = $importTodo->readLines();
+        $newlist = $importTodo->read();
 
         // ADD ITEMS TO THE TOP OR BOTTOM OF THE LIST
         if ($_POST['listPosition'] == 'top') {
@@ -62,7 +67,7 @@
         }
 
         // SAVE TODOLIST AFTER IMPORT
-        $todo->writeLines($todoList);
+        $todo->write($todoList);
     }
 
 ?>

@@ -9,15 +9,13 @@ class AddressDataStore extends Filestore {
     public function __construct($filename = '') {
         parent::__construct(strtolower($filename));
     }
-    
-    // METHOD TO READ ADDRESSBOOK CSV FILE DATA INTO AN ARRAY
-    public function readAddressBook() {
-        $addressBook = $this->readCsv();
-        return $addressBook;
-    }
 
-    // METHOD TO SAVE ADDRESSBOOK ENTRY DATA TO CSV FILE
-    public function writeAddressBook($addressArray) {
-        $this->writeCsv($addressArray);
+    // CHECK LENGTH OF EACH INPUT, THROW EXCEPTION IF OVER 125
+    public function checkLength($array) {
+        foreach ($array as $input) {
+            if (strlen($input) == 0 || strlen($input) > 125) {
+                throw new Exception("\"$input\" was either empty or longer than 125 characters.");
+            }
+        }
     }
 }
