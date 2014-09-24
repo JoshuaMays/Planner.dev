@@ -1,5 +1,6 @@
 <?php
-
+    // require_once('../data/todo_item_connect.php');
+    // require_once('inc/TodoManager.class.php');
     require('inc/filestore.php');
 
     // DEFINE A CONSTANT FILEPATH/NAME TO READ/WRITE
@@ -33,16 +34,22 @@
         echo "Well hello there. You just uploaded a file. Download it @ <a href='/uploads/{$uploadfilename}'>here</a>";
     }
 
-    // ADD SINGLE ITEM FROM INPUT FORM
-    if (isset($_POST['additem'])) {
-        // THROW EXCEPTION IF TODO ITEM IS EMPTY OR LONGER THAN 240 CHARS
-        if (strlen($_POST['additem']) == 0 || strlen($_POST['additem']) > 240 ) {
-            throw new Exception("Your todo item was either empty or longer than 240 characters. \"{$_POST['additem']}\"");
+    try {
+        // ADD SINGLE ITEM FROM INPUT FORM
+        if (isset($_POST['additem'])) {
+            // THROW EXCEPTION IF TODO ITEM IS EMPTY OR LONGER THAN 240 CHARS
+            if (strlen($_POST['additem']) == 0) {
+                throw new Exception("<img src='/img/sparklepizza.gif' alt='Error Pizza'><br><p>Your todo item was empty.<br>At least you tried. Have some pizza.</p>");
+            }
+            else if (strlen($_POST['additem']) > 240) {
+                throw new Exception("<img src='/img/sparklepizza.gif' alt='Error Pizza'><br><p>Your todo item was longer than 240 characters.<br>At least you tried. Have some pizza.</p><br>");
+            }
+            $_POST['additem'] = strip_tags($_POST['additem']);
+            $todoList[] = $_POST['additem'];
+            $todo->write($todoList);
         }
-        
-        $_POST['additem'] = strip_tags($_POST['additem']);
-        $todoList[] = $_POST['additem'];
-        $todo->write($todoList);
+    } catch (Exception $e) {
+        $error = $e->getMessage();
     }
 
     // REMOVE SINGLE ITEM FROM $todoList
@@ -82,6 +89,9 @@
 </head>
 <body>
     <div id="container">
+        <? if (isset($error)): ?>
+            <h1><?= $error; ?></h1>
+        <? endif; ?>
         <h1 id="todo">Todo List!</h1>
         <ol>
             <!-- LIST OUT EACH OF THE TODO ITEMS -->

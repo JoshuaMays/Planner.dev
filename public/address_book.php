@@ -25,9 +25,13 @@ if (!empty($_POST) && !isset($_POST['remove_item'])) {
         $_POST[$key] = strip_tags(trim($input));
     }
 
-    // Run INPUT LENGTH VALIDATION
-    $addressDS->checkLength($_POST);
-
+    try {
+        // Run INPUT LENGTH VALIDATION
+        $addressDS->checkLength($_POST);
+    } catch (Exception $e) {
+        $error = $e->getMessage();
+    }
+    
     // SANITIZE PHONE NUMBER FOR DATABASE
     $_POST['phone'] = phoneReplace($_POST['phone']);
 
