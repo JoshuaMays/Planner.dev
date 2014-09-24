@@ -13,8 +13,10 @@ class AddressDataStore extends Filestore {
     // CHECK LENGTH OF EACH INPUT, THROW EXCEPTION IF OVER 125
     public function checkLength($array) {
         foreach ($array as $input) {
-            if (strlen($input) == 0 || strlen($input) > 125) {
-                throw new Exception("\"$input\" was either empty or longer than 125 characters.");
+            if (strlen($input) == 0) {
+                throw new Exception ("<img src='/img/sparklepizza.gif' alt='Error Pizza'><br><p>\"$input was empty. <br>At least you tried. Have some pizza.</p>");
+            } else if (strlen($input) > 125) {
+                throw new Exception("<img src='/img/sparklepizza.gif' alt='Error Pizza'><br><p>\"$input was empty. <br>At least you tried. Have some pizza.</p>");
             }
         }
     }
