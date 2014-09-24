@@ -26,20 +26,21 @@ if (!empty($_POST) && !isset($_POST['remove_item'])) {
     }
 
     try {
-        // Run INPUT LENGTH VALIDATION
+        // RUN INPUT LENGTH VALIDATION
         $addressDS->checkLength($_POST);
-    } catch (Exception $e) {
+        // SANITIZE PHONE NUMBER FOR DATABASE
+        $_POST['phone'] = phoneReplace($_POST['phone']);
+
+        // PUSH FORM ADDRESS BOOK ENTRY INTO ADDRESS BOOK ARRAY.
+        $addressBook[] = $_POST;
+
+        // SAVE NEW ENTRY TO CSV FILE
+        $addressDS->write($addressBook);
+    } catch (InvalidInputException $e) {
         $error = $e->getMessage();
     }
     
-    // SANITIZE PHONE NUMBER FOR DATABASE
-    $_POST['phone'] = phoneReplace($_POST['phone']);
 
-    // PUSH FORM ADDRESS BOOK ENTRY INTO ADDRESS BOOK ARRAY.
-    $addressBook[] = $_POST;
-
-    // SAVE NEW ENTRY TO CSV FILE
-    $addressDS->write($addressBook);
 }
 
 // ALLOW USER TO UPLOAD A CSV FILE TO IMPORT CONTACTS INTO THE ADDRESS BOOK
@@ -85,6 +86,9 @@ if (isset($_POST['remove_item'])) {
 </head>
 <body>
     <div id="wrap">
+        <? if (isset($error)): ?>
+            <h1><?= $error; ?></h1>
+        <? endif; ?>
         <div class="container">
             <div id ="addressBook" class="row">
                 <div class="col-md-8 table-responsive">
