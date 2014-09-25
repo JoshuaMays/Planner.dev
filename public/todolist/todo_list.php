@@ -1,7 +1,6 @@
 <?php
 
 require('../../data/todo_list_connect.php');
-// require('inc/TodoItem.class.php');
 require('inc/TodoManager.class.php');
 
 // LOAD A TODOMANAGER OBJECT FOR DISPLAYING TODO LIST
@@ -19,8 +18,18 @@ if (isset($_POST['remove_item'])) {
     $completeTodo->update();
 }
 
+// WORKING ON IMPORTING A FILE OF LIST ITEMS
+if (count($_FILES) > 0 && $_FILES['fileUpload']['error'] == UPLOAD_ERR_OK && $_FILES['fileUpload']['type'] == 'text/plain') {
+    $test = $todoManager->importFile();
+    
+}
+
 // DISPLAY ALL OF THE TODO ITEMS THAT HAVE NOT BEEN MARKED COMPLETE
-$todos = $todoManager->loadItems(); 
+$offset = isset($_GET['offset']) ? intval($_GET['offset']) : 0;
+// ASSIGNING COUNT OF RECORDS IN TABLE TO A VARIABLE FOR PAGINATION LINKS
+$count = (int) $dbc->query('SELECT count(*) FROM todo_items WHERE date_completed IS NULL')->fetchColumn();
+
+$todos = $todoManager->loadItems($offset); 
 
 ?>
 <html>
@@ -61,6 +70,15 @@ $todos = $todoManager->loadItems();
                         <li><button class="btn btn-danger remove-button" data-item-id="<?= $itemContent->getId(); ?>" >Complete</button> <?= $itemContent->getContent(); ?></li>
                     <? endforeach; ?>
                 </ol>
+                <? // HIDE PREV BUTTON WHEN AT BEGINNING OF RECORDS ?>
+                <? if ($offset != 0): ?>
+                    <a href="?offset=<?=$offset-10;?>"><button class="btn btn-primary">Prev</button></a>
+                <? endif; ?>
+                
+                <!-- HIDE NEXT BUTTON WHEN AT END OF RECORDS -->
+                <? if (($offset+10) < $count): ?>
+                    <a href="?offset=<?=$offset+10;?>"><button class="btn btn-primary pull-right">Next</button></a>
+                <? endif; ?>
             </div>
             <div id="import-file" class="col-sm-4 col-sm-offset-2">
                 <h2>Add Tasks from a File:</h2>
@@ -74,7 +92,7 @@ $todos = $todoManager->loadItems();
                 </form>
             </div><!-- END import-file -->
         </div>
-        <form action="/todolist/" method="POST" id="remove-form">
+        <form action="/todolist/todo_list.php" method="POST" id="remove-form">
             <input type="hidden" name="remove_item" id="remove-item">
         </form><!-- END remove-form -->
     </div><!-- END page-wrap -->
