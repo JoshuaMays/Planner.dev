@@ -9,31 +9,29 @@ $contacts = $addressBook->loadContacts();
 
 require_once('header.php');
 ?>
-    <div id="page-wrap">
-        <div class="container">
-            <h1 class="text-center">Address Book</h1>
-            <div class="col-sm-8 col-sm-offset-2">
-                <div class="row">
-                    <table class="table table-striped">
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Phone Number</th>
-                        <th>View</th>
-                        <? // LOOP THROUGH CONTACTS TO DISPLAY THEM ?>
-                        <? foreach ($contacts as $index => $contact): ?>
-                            <tr>
-                                <? foreach ($contact->getContactInfo() as $info): ?>
-                                <td><?= $info; ?></td>
-                                <? endforeach; ?>
-                                <td><a href="view_contact.php?id=<?= $contact->getId(); ?>" class="btn btn-primary">View Contact</a>
-                            </tr>
-                        <? endforeach; ?>
-                    </table>
-                </div>
+<div id="page-wrap">
+    <div class="container">
+        <h1 class="text-center">Address Book</h1>
+        <div class="col-sm-8 col-sm-offset-2">
+            <div class="row">
+                <table id="displayContactsTable" class="table table-striped">
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Phone Number</th>
+                    <th>View</th>
+                    <? // LOOP THROUGH CONTACTS TO DISPLAY THEM ?>
+                    <? foreach ($contacts as $index => $contact): ?>
+                        <tr>
+                            <? foreach ($contact->getContactInfo() as $info): ?>
+                            <td><?= $info; ?></td>
+                            <? endforeach; ?>
+                            <td><a href="view_contact.php?id=<?= $contact->getId(); ?>" class="btn btn-primary">View Contact</a>
+                        </tr>
+                    <? endforeach; ?>
+                </table><!-- END #displayContactsTable -->
             </div>
-        
-        
-        
+        </div>
     </div>
+</div><!-- END #page-wrap -->
 
 <? require_once('footer.php'); ?>
