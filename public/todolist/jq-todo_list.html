@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Todo List</title>
+
+        <!-- Bootstrap CSS -->
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <h1 class="text-center">Todo List</h1>
+        
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Todo Item</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="todoItemsTableBody">
+
+                        </tbody>
+                    </table>
+                    <p id="emptyListNote">There are no items currently on your todo list. How about you add one?</p>
+                </div>
+                <div class="col-lg-3 col-lg-offset-1">
+                    <h2>Add an Item</h2>
+                    <form action="" method="POST" role="form">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="addItem" placeholder="Something you want to do">
+                        </div>
+
+                        <button id="AddItemButton"type="submit" class="btn btn-primary">Add It</button>
+                    </form>
+                </div>
+            </div>
+            <!-- MODAL FOR EDITING AN ITEM -->
+            <div class="modal fade" tabindex="-1" id="editItemModal">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">Edit an Item</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="editContent">Content</label>
+                                <input type="text" class="form-control" id="editContent" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" id="saveEdit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+        </div>
+        <!-- jQuery -->
+        <script src="//code.jquery.com/jquery.js"></script>
+        <!-- Bootstrap JavaScript -->
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <!-- Custom JS -->
+        <script>
+        $(document).ready(function()
+        {
+            // COLLECT ALL THE ROWS OF TODO ITEMS
+            var getTodoList = function()
+            {
+                return $("#todoItemsTableBody").children();
+            }
+
+            // ADD AN ITEM ROW TO THE TODO LIST
+            var addTodoItem = function()
+            {
+                // GRAB USER INPUT FROM FORM
+                var itemText = $("#addItem").val();
+
+                // TD ELEMENT WITH EDIT AND REMOVE BUTTONS
+                var newItemButtons = "<td class='text-right'><button type='button' class='btn btn-default editItem'>Edit</button> <button type='button' class='btn btn-danger removeItem'>Completed</button></td>";
+
+                // APPEND ITEM TEXT AND BUTTONS TO THE TODOLIST
+                $("<tr><td class='item'>" + itemText + "</td>" + newItemButtons + "</tr>").appendTo($("#todoItemsTableBody"));
+
+                // HIDE THE EMPTY LIST NOTE
+                isListEmpty();
+            }
+            
+            // CHECK IF THERE ARE ANY ITEMS IN THE LIST
+            var isListEmpty = function()
+            {
+                // COLLECT ITEMS ON THE LIST
+                todoList = getTodoList();
+
+                // IF LIST IS EMPTY, SHOW EMPTY LIST NOTE
+                if (todoList.length == 0) {
+                    $("#emptyListNote").show();
+                }
+                // HIDE THE EMPTY LIST NOTE
+                else {
+                    $("#emptyListNote").hide();
+                }
+            }
+
+            // CLICK EVENT FOR ADDING AN ITEM
+            $("#AddItemButton").click(function(e) 
+            {
+                e.preventDefault();
+                addTodoItem();
+            });
+
+            // CLICK EVENT FOR REMOVING AN ITEM
+            $("#todoItemsTableBody").on("click",".removeItem", function()
+            {
+                // FIND PARENT TR OF THE BUTTON CLICKED AND REMOVE WHOLE ROW
+                $(this).parents("tr").remove();
+
+                // CHECK IF ALL ITEMS HAVE BEEN REMOVED FROM THE LIST
+                isListEmpty();
+            });
+            
+            // CLICK EVENT TO OPEN EDIT ITEM FORM
+            $("#todoItemsTableBody").on("click",".editItem", function()
+            {
+                // CAPTURE ITEM THAT WILL BE EDITED
+                var itemToEdit = $(this).parents("tr").children(".item");
+                // CAPTURE CONTENT OF THE ITEM
+                var content = itemToEdit.text();
+                var newContent = '';
+
+                // SHOW THE EDIT FORM MODAL
+                $("#editItemModal").modal('show');
+
+                // SEED THE CURRENT CONTENT OF ITEM TO THE INPUT FIELD
+                $("#editContent").val(content);
+                
+                // SAVE BUTTON CLICK EVENT HANDLER
+                $("#saveEdit").click(function()
+                {
+                    // CAPTURE THE NEW CONTENT
+                    newContent = $("#editContent").val();
+
+                    // CHANGE THE LIST ITEM CONTENT TO THE UPDATED CONTENT
+                    itemToEdit.text(newContent);
+
+                    // HIDE THE EDIT MODAL
+                    $("#editItemModal").modal('hide');
+                    
+                    // UNBIND SAVE CLICK EVENT
+                    $(this).unbind();
+                });
+
+                // UNBIND EDIT CLICK EVENT
+                $(this).unbind();
+            });
+        });
+        </script>
+    </body>
+</html>
